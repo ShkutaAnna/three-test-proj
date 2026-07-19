@@ -69,6 +69,8 @@ export class Laser {
 
             const hit = hits[0];
 
+            if (!hit?.face) continue;
+
             this.points.push(hit.point.clone());
 
             const normal = hit.face.normal.clone();
@@ -158,47 +160,47 @@ export class Laser {
         return renderPoints;
     }
 
-    private getRenderPoints1() {
-        const renderPoints: THREE.Vector3[] = [];
+    // private getRenderPoints1() {
+    //     const renderPoints: THREE.Vector3[] = [];
 
-        let remaining = this.currentLength;
+    //     let remaining = this.currentLength;
 
-        for (let i = 0; i < this.points.length - 1; i++) {
+    //     for (let i = 0; i < this.points.length - 1; i++) {
 
-            const start = this.points[i];
-            const end = this.points[i + 1];
+    //         const start = this.points[i];
+    //         const end = this.points[i + 1];
 
-            const segmentLength = start.distanceTo(end);
+    //         const segmentLength = start.distanceTo(end);
 
-            // if (segmentLength > this.beamStart) {
-            //     const dir = end.clone().sub(start).normalize();
-            //     const point = start.clone().add(dir.multiplyScalar(remaining));
-            // }
+    //         // if (segmentLength > this.beamStart) {
+    //         //     const dir = end.clone().sub(start).normalize();
+    //         //     const point = start.clone().add(dir.multiplyScalar(remaining));
+    //         // }
 
-            // весь сегмент вже пройдений
-            if (remaining >= segmentLength) {
+    //         // весь сегмент вже пройдений
+    //         if (remaining >= segmentLength) {
 
-                renderPoints.push(start);
-                renderPoints.push(end);
+    //             renderPoints.push(start);
+    //             renderPoints.push(end);
 
-                remaining -= segmentLength;
-            } else {
-                // тільки частина сегмента
-                const dir = end.clone()
-                    .sub(start)
-                    .normalize();
+    //             remaining -= segmentLength;
+    //         } else {
+    //             // тільки частина сегмента
+    //             const dir = end.clone()
+    //                 .sub(start)
+    //                 .normalize();
 
-                const point = start.clone().add(dir.multiplyScalar(remaining));
+    //             const point = start.clone().add(dir.multiplyScalar(remaining));
 
-                renderPoints.push(start);
-                renderPoints.push(point);
+    //             renderPoints.push(start);
+    //             renderPoints.push(point);
 
-                break;
-            }
-        }
+    //             break;
+    //         }
+    //     }
 
-        return renderPoints;
-    }
+    //     return renderPoints;
+    // }
 
     // private calculateLength() {
     //     this.totalLength = 0;

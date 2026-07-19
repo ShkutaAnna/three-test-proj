@@ -36,7 +36,7 @@ export class ParticleExplosion {
         particles.raycast = () => {};
         this.scene.add(particles);
 
-        const velocities = [];
+        const velocities: Velocity[] = [];
 
         for (let i = 0; i < count; i++) {
             point.toArray(positions, i * 3);
@@ -91,4 +91,10 @@ export class ParticleExplosion {
         const index = Math.round(Math.random() * colors.length);
         return colors[index];
     }
+}
+
+export type Velocity = {
+    dx: number;
+    dy: number;
+    dz: number;
 }

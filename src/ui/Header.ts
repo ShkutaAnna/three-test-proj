@@ -6,7 +6,7 @@ export class Header {
         this.element.classList.add('header');
     }
 
-    add(child: HTMLElement) {
+    // add(child: HTMLElement) {
 
-    }
+    // }
 }

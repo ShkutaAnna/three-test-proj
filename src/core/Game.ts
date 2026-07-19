@@ -5,16 +5,15 @@ import { SceneManager } from "./Scene";
 import { CameraManager } from "./Camera";
 import { RendererManager } from "./Renderer";
 
-import { MovementDirection, Player, type ActiveMovementDirection } from "../objects/Player";
+import { Player, type ActiveMovementDirection } from "../objects/Player";
 import { Enemy } from "../objects/Enemy";
-import { Field } from "../objects/Field";
 
-import { AnimationManager } from "../animations/AnimationManager";
+// import { AnimationManager } from "../animations/AnimationManager";
 import { ResizeManager } from "./Resize";
 import { InputManager } from "./InputManager";
 import { RaycasterManager } from "./RaycasterManager";
 import { EffectManager } from "../effects/EffectManager";
-import { UIManager } from "../ui/UIManager";
+// import { UIManager } from "../ui/UIManager";
 import { BoxField } from "../objects/BoxField";
 import { Laser } from "../effects/Laser";
 
@@ -22,11 +21,10 @@ export class Game {
     private sceneManager = new SceneManager();
     private camaraManager = new CameraManager();
     private rendererManager = new RendererManager();
-    private resizeManager: ResizeManager;
     private effectManager: EffectManager;
     private inputManager = new InputManager();
     private raycaster: RaycasterManager;
-    private uiManager = new UIManager();
+    // private uiManager = new UIManager();
 
     private player = new Player();
     private enemy = new Enemy();
@@ -35,7 +33,7 @@ export class Game {
 
     private controls: OrbitControls;
 
-    private animations = new AnimationManager();
+    // private animations = new AnimationManager();
     private lasers: Laser[] = [];
     
     private splashDistance = 0;
@@ -51,7 +49,7 @@ export class Game {
     }
 
     constructor() {
-        this.resizeManager = new ResizeManager(this.camaraManager.camera, this.rendererManager.renderer);
+        new ResizeManager(this.camaraManager.camera, this.rendererManager.renderer);
         this.raycaster = new RaycasterManager(this.camaraManager.camera, this.sceneManager.scene);
         this.effectManager = new EffectManager(this.sceneManager.scene);
         this.sceneManager.scene.add(this.player.mesh);
