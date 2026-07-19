@@ -13,7 +13,7 @@ import { ResizeManager } from "./Resize";
 import { InputManager } from "./InputManager";
 import { RaycasterManager } from "./RaycasterManager";
 import { EffectManager } from "../effects/EffectManager";
-// import { UIManager } from "../ui/UIManager";
+import { UIManager } from "../ui/UIManager";
 import { BoxField } from "../objects/BoxField";
 import { Laser } from "../effects/Laser";
 
@@ -24,7 +24,6 @@ export class Game {
     private effectManager: EffectManager;
     private inputManager = new InputManager();
     private raycaster: RaycasterManager;
-    // private uiManager = new UIManager();
 
     private player = new Player();
     private enemy = new Enemy();
@@ -49,6 +48,7 @@ export class Game {
     }
 
     constructor() {
+        new UIManager();
         new ResizeManager(this.camaraManager.camera, this.rendererManager.renderer);
         this.raycaster = new RaycasterManager(this.camaraManager.camera, this.sceneManager.scene);
         this.effectManager = new EffectManager(this.sceneManager.scene);
