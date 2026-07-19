@@ -122,17 +122,14 @@ export class Game {
     }
 
     private handleClick = (event: PointerEvent) => {
-        const hit = this.raycaster.getIntersection(event); // , this.field.mesh
+        const hit = this.raycaster.getIntersection(event);
         if (!hit) return;
 
-        // console.log(hit.object.id);
         // if (hit.object.id === this.field.mesh.id) {
-        //     console.log('particles');
         //     this.effectManager.spawnParticleExplosion(hit.point);
         // }
 
         if (hit.object.id === this.boxField.floor.id) {
-            console.log('particles');
             this.effectManager.spawnParticleExplosion(hit.point);
         }
     }
