@@ -8,10 +8,20 @@ export class Player {
 
     private playerSize = 2;
 
+    private colors = ['#ffffff', '#33ff00'];
+    private materials = [
+        new THREE.MeshMatcapMaterial({ color: this.colors[0] }), // right
+        new THREE.MeshMatcapMaterial({ color: this.colors[0] }), // left
+        new THREE.MeshMatcapMaterial({ color: this.colors[0] }), // top
+        new THREE.MeshMatcapMaterial({ color: this.colors[0] }), // bottom
+        new THREE.MeshMatcapMaterial({ color: this.colors[1] }), // front
+        new THREE.MeshMatcapMaterial({ color: this.colors[0] }), // back
+    ];
+
     constructor() {
         this.mesh = new THREE.Mesh(
             new THREE.BoxGeometry(this.playerSize, this.playerSize, this.playerSize),
-            new THREE.MeshMatcapMaterial(),
+            this.materials,
         );
 
         this.mesh.position.y = this.playerSize / 2;
@@ -20,7 +30,7 @@ export class Player {
     public movePlayer(params: ActiveMovementDirection) {
         const { Up, Down, Left, Right } = params;
         if (Up || Down) {
-            const forward = new THREE.Vector3(0, 0, (Down ? 1 : -1));
+            const forward = new THREE.Vector3(0, 0, (Down ? -1 : 1));
             forward.applyQuaternion(this.mesh.quaternion);
             this.mesh.position.addScaledVector(forward, this.speed);
         }

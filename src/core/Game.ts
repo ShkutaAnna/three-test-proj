@@ -1,4 +1,3 @@
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import * as THREE from 'three';
 
 import { SceneManager } from "./Scene";
@@ -16,6 +15,8 @@ import { EffectManager } from "../effects/EffectManager";
 import { UIManager } from "../ui/UIManager";
 import { BoxField } from "../objects/BoxField";
 import { Laser } from "../effects/Laser";
+import { OrbitControlManager } from "./OrbitControlManager";
+import { GuiManager } from "./GuiManager";
 
 export class Game {
     private sceneManager = new SceneManager();
@@ -24,13 +25,14 @@ export class Game {
     private effectManager: EffectManager;
     private inputManager = new InputManager();
     private raycaster: RaycasterManager;
+    private guiManager: GuiManager;
 
     private player = new Player();
     private enemy = new Enemy();
     // private field = new Field();
     private boxField = new BoxField();
 
-    private controls: OrbitControls;
+    private orbitControlManager: OrbitControlManager;
 
     // private animations = new AnimationManager();
     private lasers: Laser[] = [];
@@ -52,6 +54,11 @@ export class Game {
         new ResizeManager(this.camaraManager.camera, this.rendererManager.renderer);
         this.raycaster = new RaycasterManager(this.camaraManager.camera, this.sceneManager.scene);
         this.effectManager = new EffectManager(this.sceneManager.scene);
+        this.guiManager = new GuiManager();
+        this.guiManager.gui.hide();
+        this.guiManager.addDefaultControls('ball', this.enemy.mesh);
+        this.guiManager.addDefaultControls('camera', this.camaraManager.camera);
+        
         this.sceneManager.scene.add(this.player.mesh);
         this.sceneManager.scene.add(this.enemy.mesh);
         this.sceneManager.scene.add(this.boxField.boxGroup);
@@ -62,10 +69,12 @@ export class Game {
         this.inputManager.onKeyRelease(this.handleKeyUp);
 
         // FLY CAMERA
-        this.controls = new OrbitControls(this.camaraManager.camera, this.rendererManager.renderer.domElement);
-        this.camaraManager.camera.position.set( 0, 20, 100 );
-        this.controls.update();
-        // end
+        this.orbitControlManager = new OrbitControlManager(this.camaraManager.camera, this.rendererManager.renderer);
+        this.orbitControlManager.isEnabled = false;
+
+        const axesHelper = new THREE.AxesHelper(5);
+        this.sceneManager.scene.add(axesHelper);
+        axesHelper.setColors('#ffffff', '#000000', '#ff0000');
         
         this.animate();
     }
@@ -74,9 +83,10 @@ export class Game {
         requestAnimationFrame(this.animate);
 
         this.executeMoves();
+
         // FLY CAMERA
-        this.controls.update();
-        // end
+        if (this.orbitControlManager.isEnabled)
+            this.orbitControlManager.update();
 
         const dt = this.clock.getDelta();
 
@@ -99,6 +109,7 @@ export class Game {
         if (!Object.values(this.playerMovementState).some(Boolean)) return;
 
         this.player.movePlayer(this.playerMovementState);
+        this.camaraManager.camera.lookAt(this.player.mesh.position);
 
         const distance = this.player.mesh.position.distanceTo(this.lastPlayerPos);
         this.splashDistance += distance;
