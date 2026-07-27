@@ -44,12 +44,10 @@ export class MeteoManager {
                 -this.width / 2,
                 this.width / 2
             ),
-
             this.center.y + this.height * 2,
-
             this.center.z + THREE.MathUtils.randFloat(
-                -length / 2,
-                length / 2
+                -this.length / 2,
+                this.length / 2
             )
         )
     }
