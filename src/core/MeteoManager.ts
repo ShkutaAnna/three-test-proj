@@ -22,7 +22,7 @@ export class MeteoManager {
 
     checkForHits(player: Player) {
         const playerBox = new THREE.Box3().setFromObject(player.player);
-        this.meteos.forEach((meteo, i) => {
+        this.meteos.forEach((meteo) => {
             const itemBox = new THREE.Box3().setFromObject(meteo.mesh);
             if (playerBox.intersectsBox(itemBox)) {
                 if (meteo.isCollected) return;
