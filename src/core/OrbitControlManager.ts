@@ -32,9 +32,8 @@ export class OrbitControlManager {
     }
 
     private init() {
-        console.log('init');
         this._controls = new OrbitControls(this._camera, this._renderer.domElement);
-        this._camera.position.set( 0, 20, 100 );
+        this._camera.position.set(0, 5, 5);
         this._controls.update();
     }
 }

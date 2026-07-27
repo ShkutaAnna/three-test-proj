@@ -24,7 +24,8 @@ export class ParticleExplosion {
         const particlesMaterial = new THREE.PointsMaterial();
         particlesMaterial.size = 0.2;
         particlesMaterial.sizeAttenuation = true;
-        particlesMaterial.color = new THREE.Color(this.getRandomColor());
+        particlesMaterial.color = new THREE.Color(Math.random(), Math.random(), Math.random()); 
+        // new THREE.Color(this.getRandomColor());
         particlesMaterial.transparent = true;
         particlesMaterial.alphaMap = this.textureLoader.load(circleTexture);
         // do not render black pixels
@@ -32,6 +33,12 @@ export class ParticleExplosion {
         // particles hidden by objects will still be visible
         // particlesMaterial.depthTest = false;
         particlesMaterial.depthWrite = false;
+        // blend colors that are on top of each other (in space), can impact performance
+        // particlesMaterial.blending = THREE.AdditiveBlending;
+
+        // look for color attrib instead of material color
+        // particlesMaterial.vertexColors = false;
+        // particlesGeometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array([0.2, 0.3, 0.5]), 3))
 
         const particles = new THREE.Points(particlesGeometry, particlesMaterial);
         particles.raycast = () => {};
@@ -79,19 +86,19 @@ export class ParticleExplosion {
         });
     }
 
-    private getRandomColor(): string {
-        const colors = [
-            '#047cf3',
-            '#07f5f5',
-            '#f305d3',
-            '#ee2f0d',
-            '#32f10b',
-            '#5c1858',
-            '#f1720a',
-        ];
-        const index = Math.round(Math.random() * colors.length);
-        return colors[index];
-    }
+    // private getRandomColor(): string {
+    //     const colors = [
+    //         '#047cf3',
+    //         '#07f5f5',
+    //         '#f305d3',
+    //         '#ee2f0d',
+    //         '#32f10b',
+    //         '#5c1858',
+    //         '#f1720a',
+    //     ];
+    //     const index = Math.round(Math.random() * colors.length);
+    //     return colors[index];
+    // }
 }
 
 export type Velocity = {

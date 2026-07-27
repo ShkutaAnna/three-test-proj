@@ -12,7 +12,7 @@ export class Laser {
     public beamStart = 0;
     public beamEnd = 0;
 
-    public maxLength = 10;
+    public maxLength = 40;
     
     public currentLength = 0;
 
@@ -212,16 +212,22 @@ export class Laser {
 
     private calculateSegments(points: THREE.Vector3[]): LaserSegment[] {
         const segments = [];
+        let totalDistance = 0;
+
         for (let i = 0; i < points.length - 1; i++) {
             const start = points[i];
             const end = points[i+1];
 
+            const length = start.distanceTo(end);
+
             segments.push({
                 start,
                 end,
-                startDistance: start.distanceTo(points[0]),
-                endDistance: end.distanceTo(points[0]),
+                startDistance: totalDistance,// start.distanceTo(points[0]),
+                endDistance: totalDistance + length, // end.distanceTo(points[0]),
             });
+
+            totalDistance += length;
         }
         return segments;
     }

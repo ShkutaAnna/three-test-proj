@@ -7,8 +7,8 @@ export class BoxField {
     public boxGroup: THREE.Group;
 
 
-    private width = 20;
-    private height = 5;
+    public readonly width = 20;
+    public readonly height = 5;
     // private depth = 1;
 
     constructor() {

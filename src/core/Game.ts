@@ -5,7 +5,6 @@ import { CameraManager } from "./Camera";
 import { RendererManager } from "./Renderer";
 
 import { Player, type ActiveMovementDirection } from "../objects/Player";
-import { Enemy } from "../objects/Enemy";
 
 // import { AnimationManager } from "../animations/AnimationManager";
 import { ResizeManager } from "./Resize";
@@ -17,6 +16,8 @@ import { BoxField } from "../objects/BoxField";
 import { Laser } from "../effects/Laser";
 import { OrbitControlManager } from "./OrbitControlManager";
 import { GuiManager } from "./GuiManager";
+import { Bullet } from '../effects/Bullet';
+import { MeteoManager } from './MeteoManager';
 
 export class Game {
     private sceneManager = new SceneManager();
@@ -27,15 +28,19 @@ export class Game {
     private raycaster: RaycasterManager;
     private guiManager: GuiManager;
 
-    private player = new Player();
-    private enemy = new Enemy();
+    private player = new Player(this.camaraManager.camera);
     // private field = new Field();
     private boxField = new BoxField();
+
+    private meteoManager: MeteoManager;
 
     private orbitControlManager: OrbitControlManager;
 
     // private animations = new AnimationManager();
+    private isLasersActive = false;
     private lasers: Laser[] = [];
+    private isBulletsActive = true;
+    private bullets: Bullet[] = [];
     
     private splashDistance = 0;
     private lastPlayerPos = new THREE.Vector3();
@@ -56,26 +61,24 @@ export class Game {
         this.effectManager = new EffectManager(this.sceneManager.scene);
         this.guiManager = new GuiManager();
         this.guiManager.gui.hide();
-        this.guiManager.addDefaultControls('ball', this.enemy.mesh);
         this.guiManager.addDefaultControls('camera', this.camaraManager.camera);
-        
-        this.sceneManager.scene.add(this.player.mesh);
-        this.sceneManager.scene.add(this.enemy.mesh);
+        this.sceneManager.scene.add(this.player.group);
         this.sceneManager.scene.add(this.boxField.boxGroup);
 
-        // this.animations.rotate(this.player.mesh);
+        this.meteoManager = new MeteoManager(this.boxField.width, this.boxField.width, this.boxField.height, this.boxField.boxGroup.position, this.sceneManager.scene);
+
         this.inputManager.onClick(this.handleClick);
         this.inputManager.onKeyPressed(this.handleKeyPress);
         this.inputManager.onKeyRelease(this.handleKeyUp);
 
         // FLY CAMERA
         this.orbitControlManager = new OrbitControlManager(this.camaraManager.camera, this.rendererManager.renderer);
-        this.orbitControlManager.isEnabled = false;
+        this.orbitControlManager.isEnabled = true;
 
         const axesHelper = new THREE.AxesHelper(5);
         this.sceneManager.scene.add(axesHelper);
         axesHelper.setColors('#ffffff', '#000000', '#ff0000');
-        
+
         this.animate();
     }
 
@@ -90,12 +93,23 @@ export class Game {
 
         const dt = this.clock.getDelta();
 
+        this.meteoManager.checkForHits(this.player);
+
         for (let i = 0; i < this.lasers.length; i++) {
             const laser = this.lasers[i];
             laser.update(dt);
             if (laser.isFinished) {
                 laser.dispose();
                 this.lasers.splice(i, 1);
+            }
+        }
+
+        for (let i = 0; i < this.bullets.length; i++) {
+            const bullet = this.bullets[i];
+            bullet.update(dt);
+            if (bullet.isFinished) {
+                this.sceneManager.scene.remove(bullet);
+                this.bullets.splice(i, 1);
             }
         }
 
@@ -109,9 +123,9 @@ export class Game {
         if (!Object.values(this.playerMovementState).some(Boolean)) return;
 
         this.player.movePlayer(this.playerMovementState);
-        this.camaraManager.camera.lookAt(this.player.mesh.position);
+        this.camaraManager.camera.lookAt(this.player.group.position);
 
-        const distance = this.player.mesh.position.distanceTo(this.lastPlayerPos);
+        const distance = this.player.group.position.distanceTo(this.lastPlayerPos);
         this.splashDistance += distance;
 
         if (this.splashDistance > 0.5) { // every 0.5 units
@@ -119,7 +133,7 @@ export class Game {
             this.splashDistance = 0;
         }
 
-        this.lastPlayerPos.copy(this.player.mesh.position);
+        this.lastPlayerPos.copy(this.player.group.position);
     }
 
     private splashWaterFromPlayer() {
@@ -148,7 +162,13 @@ export class Game {
     private handleKeyPress = (event: KeyboardEvent) => {
         const { key } = event;
         if (key === ActionKeyboardKeys.Space) {
-            this.shootLaserFromPlayer();
+            if (this.isLasersActive) {
+                this.shootLaserFromPlayer();
+            }
+
+            if (this.isBulletsActive) {
+                this.shootBulletFromPlayer();
+            }
         }
         
         if (Object.values(MovementDirectionKeyboardKeys).includes(key as KeyboardKeys)) {
@@ -184,9 +204,19 @@ export class Game {
         }
     }
 
+    private shootBulletFromPlayer() {
+        const origin = this.player.group.position.clone();
+        console.log(origin);
+        const direction = new THREE.Vector3(0, 0, 1).applyQuaternion(this.player.group.quaternion).normalize();
+
+        const bullet = new Bullet(origin, direction, 5, this.boxField.width, this.boxField.width);
+        this.sceneManager.scene.add(bullet);
+        this.bullets.push(bullet);
+    }
+
     private shootLaserFromPlayer() {
-        const origin = this.player.mesh.position.clone();
-        const direction = new THREE.Vector3(1, 0, 0).applyQuaternion(this.player.mesh.quaternion).normalize();
+        const origin = this.player.group.position.clone();
+        const direction = new THREE.Vector3(0, 0, 1).applyQuaternion(this.player.group.quaternion).normalize();
         // this.effectManager.shootLaser(origin, direction, this.boxField.walls);
 
         const laser = new Laser(this.sceneManager.scene);
