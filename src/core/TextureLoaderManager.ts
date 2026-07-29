@@ -12,10 +12,10 @@ export class TextureLoaderManager {
     }
 
     public getTexture(key: Textures): THREE.Texture {
-        let texture = this.loadedTextures[key];
+        let texture = this.loadedTextures.get(key);
         if (!texture) {
             texture = this.textureLoader.load(this.getUrl(key));
-            this.loadedTextures[key] = texture;
+            this.loadedTextures.set(key, texture);
         }
 
         return texture;
