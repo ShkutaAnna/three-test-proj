@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import { SceneManager } from "./Scene";
 import { CameraManager } from "./Camera";
@@ -14,7 +15,6 @@ import { EffectManager } from "../effects/EffectManager";
 import { UIManager } from "../ui/UIManager";
 import { BoxField } from "../objects/BoxField";
 import { Laser } from "../effects/Laser";
-import { OrbitControlManager } from "./OrbitControlManager";
 import { GuiManager } from "./GuiManager";
 import { Bullet } from '../effects/Bullet';
 import { MeteoManager } from './MeteoManager';
@@ -23,7 +23,7 @@ import { LightManager } from './Light';
 
 export class Game {
     private sceneManager = new SceneManager();
-    private camaraManager = new CameraManager();
+    private cameraManager = new CameraManager();
     private lightManager = new LightManager();
     private rendererManager = new RendererManager();
     private effectManager: EffectManager;
@@ -32,13 +32,13 @@ export class Game {
     private guiManager: GuiManager;
     private textureLoaderManager = new TextureLoaderManager();
 
-    private player = new Player(this.camaraManager.camera);
+    private player = new Player(this.cameraManager.camera);
     // private field = new Field();
     private boxField = new BoxField();
 
     private meteoManager: MeteoManager;
 
-    private orbitControlManager: OrbitControlManager;
+    private orbitControls: OrbitControls;
 
     // private animations = new AnimationManager();
     private isLasersActive = false;
@@ -60,12 +60,12 @@ export class Game {
 
     constructor() {
         new UIManager();
-        new ResizeManager(this.camaraManager.camera, this.rendererManager.renderer);
-        this.raycaster = new RaycasterManager(this.camaraManager.camera, this.sceneManager.scene);
+        new ResizeManager(this.cameraManager.camera, this.rendererManager.renderer);
+        this.raycaster = new RaycasterManager(this.cameraManager.camera, this.sceneManager.scene);
         this.effectManager = new EffectManager(this.textureLoaderManager, this.sceneManager.scene);
         this.guiManager = new GuiManager();
         this.guiManager.gui.hide();
-        this.guiManager.addDefaultControls('camera', this.camaraManager.camera);
+        this.guiManager.addDefaultControls('camera', this.cameraManager.camera);
         this.sceneManager.scene.add(this.player.group);
         this.sceneManager.scene.add(this.boxField.boxGroup);
 
@@ -84,8 +84,9 @@ export class Game {
         this.inputManager.onKeyRelease(this.handleKeyUp);
 
         // FLY CAMERA
-        this.orbitControlManager = new OrbitControlManager(this.camaraManager.camera, this.rendererManager.renderer);
-        this.orbitControlManager.isEnabled = true;
+        this.orbitControls = new OrbitControls(this.cameraManager.camera, this.rendererManager.renderer.domElement);
+        this.orbitControls.enabled = true;
+        this.cameraManager.camera.position.set(0, 5, 6);
 
         const axesHelper = new THREE.AxesHelper(5);
         this.sceneManager.scene.add(axesHelper);
@@ -100,8 +101,8 @@ export class Game {
         this.executeMoves();
 
         // FLY CAMERA
-        if (this.orbitControlManager.isEnabled)
-            this.orbitControlManager.update();
+        if (this.orbitControls.enabled)
+            this.orbitControls.update();
 
         const dt = this.clock.getDelta();
 
@@ -127,7 +128,7 @@ export class Game {
 
         this.rendererManager.renderer.render(
             this.sceneManager.scene,
-            this.camaraManager.camera,
+            this.cameraManager.camera,
         )
     }
 
@@ -135,7 +136,7 @@ export class Game {
         if (!Object.values(this.playerMovementState).some(Boolean)) return;
 
         this.player.movePlayer(this.playerMovementState);
-        this.camaraManager.camera.lookAt(this.player.group.position);
+        this.cameraManager.camera.lookAt(this.player.group.position);
 
         const distance = this.player.group.position.distanceTo(this.lastPlayerPos);
         this.splashDistance += distance;
