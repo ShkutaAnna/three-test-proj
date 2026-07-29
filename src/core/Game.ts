@@ -18,15 +18,19 @@ import { OrbitControlManager } from "./OrbitControlManager";
 import { GuiManager } from "./GuiManager";
 import { Bullet } from '../effects/Bullet';
 import { MeteoManager } from './MeteoManager';
+import { TextureLoaderManager } from './TextureLoaderManager';
+import { LightManager } from './Light';
 
 export class Game {
     private sceneManager = new SceneManager();
     private camaraManager = new CameraManager();
+    private lightManager = new LightManager();
     private rendererManager = new RendererManager();
     private effectManager: EffectManager;
     private inputManager = new InputManager();
     private raycaster: RaycasterManager;
     private guiManager: GuiManager;
+    private textureLoaderManager = new TextureLoaderManager();
 
     private player = new Player(this.camaraManager.camera);
     // private field = new Field();
@@ -58,14 +62,22 @@ export class Game {
         new UIManager();
         new ResizeManager(this.camaraManager.camera, this.rendererManager.renderer);
         this.raycaster = new RaycasterManager(this.camaraManager.camera, this.sceneManager.scene);
-        this.effectManager = new EffectManager(this.sceneManager.scene);
+        this.effectManager = new EffectManager(this.textureLoaderManager, this.sceneManager.scene);
         this.guiManager = new GuiManager();
         this.guiManager.gui.hide();
         this.guiManager.addDefaultControls('camera', this.camaraManager.camera);
         this.sceneManager.scene.add(this.player.group);
         this.sceneManager.scene.add(this.boxField.boxGroup);
 
-        this.meteoManager = new MeteoManager(this.boxField.width, this.boxField.width, this.boxField.height, this.boxField.boxGroup.position, this.sceneManager.scene);
+        this.sceneManager.scene.add(this.lightManager.directionalLight);
+
+        this.meteoManager = new MeteoManager(
+            this.boxField.width, 
+            this.boxField.width, 
+            this.boxField.height, 
+            this.boxField.boxGroup.position, 
+            this.sceneManager.scene, this.textureLoaderManager,
+        );
 
         this.inputManager.onClick(this.handleClick);
         this.inputManager.onKeyPressed(this.handleKeyPress);
@@ -238,6 +250,10 @@ export enum MovementDirectionKeyboardKeys {
 
 export enum ActionKeyboardKeys {
     Space = ' ',
+
+    x = 'x',
+    y = 'y',
+    z = 'z',
 }
 
 export type KeyboardKeys = MovementDirectionKeyboardKeys & ActionKeyboardKeys;

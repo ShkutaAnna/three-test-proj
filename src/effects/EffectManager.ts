@@ -1,13 +1,15 @@
 import * as THREE from 'three';
 import { ParticleExplosion } from './ParticleExplosion';
+import type { TextureLoaderManager } from '../core/TextureLoaderManager';
 
 export class EffectManager {
     constructor(
+        private textureLoaderManager: TextureLoaderManager,
         private scene: THREE.Scene,
     ) { }
 
     public spawnParticleExplosion(position: THREE.Vector3) {
-        const explosion = new ParticleExplosion(this.scene);
+        const explosion = new ParticleExplosion(this.textureLoaderManager, this.scene);
         explosion.play(position);
     }
 

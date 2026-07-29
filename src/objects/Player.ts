@@ -48,6 +48,7 @@ export class Player {
         }
 
         if (Left || Right) {
+            // no z axis is used so no quat
             this.group.rotateY(this.turnSpeed * (Left ? 1 : -1));
         }
 

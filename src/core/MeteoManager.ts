@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Meteo } from '../objects/Meteo';
 import type { Player } from '../objects/Player';
+import type { TextureLoaderManager } from './TextureLoaderManager';
 
 export class MeteoManager {
     public count = 5;
@@ -12,9 +13,10 @@ export class MeteoManager {
         public height: number,
         public center: THREE.Vector3,
         public scene: THREE.Scene,
+        public textureLoaderManager: TextureLoaderManager,
     ) {
         for (let index = 0; index < this.count; index++) {
-            const meteo = new Meteo(this, scene);
+            const meteo = new Meteo(this, scene, textureLoaderManager);
             this.meteos.push(meteo);
             meteo.start();
         }

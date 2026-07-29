@@ -1,11 +1,10 @@
 import * as THREE from 'three';
 import { gsap } from "gsap";
-import circleTexture from '../assets/particles/circle_01.png';
+import { Textures, type TextureLoaderManager } from '../core/TextureLoaderManager';
 
 export class ParticleExplosion {
-    private textureLoader = new THREE.TextureLoader();
-
     constructor(
+        public textureLoaderManager: TextureLoaderManager,
         private scene: THREE.Scene,
     ) { }
 
@@ -27,7 +26,7 @@ export class ParticleExplosion {
         particlesMaterial.color = new THREE.Color(Math.random(), Math.random(), Math.random()); 
         // new THREE.Color(this.getRandomColor());
         particlesMaterial.transparent = true;
-        particlesMaterial.alphaMap = this.textureLoader.load(circleTexture);
+        particlesMaterial.alphaMap = this.textureLoaderManager.getTexture(Textures.circle);
         // do not render black pixels
         // particlesMaterial.alphaTest = 0.001;
         // particles hidden by objects will still be visible

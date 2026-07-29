@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import type { MeteoManager } from '../core/MeteoManager';
 import { getRandomInt } from '../utils/NumbersUtils';
+import { Textures, type TextureLoaderManager } from '../core/TextureLoaderManager';
 
 export class Meteo {
     public type: 'red' | 'green';
@@ -14,10 +15,15 @@ export class Meteo {
     constructor(
         public meteoManager: MeteoManager,
         public scene: THREE.Scene,
+        public textureLoaderManager: TextureLoaderManager,
     ) {
+        const gradientTexture = this.textureLoaderManager.getTexture(Textures.gradient3);
+        gradientTexture.magFilter = THREE.NearestFilter;
         this.mesh = new THREE.Mesh(
             new THREE.SphereGeometry(this.size),
-            new THREE.MeshMatcapMaterial(),
+            new THREE.MeshToonMaterial({
+                gradientMap: gradientTexture,
+            }),
         );
 
         this.reset();
@@ -58,7 +64,7 @@ export class Meteo {
             color = '#3cff00';
         }
 
-        const material = this.mesh.material as THREE.MeshMatcapMaterial;
+        const material = this.mesh.material as THREE.MeshToonMaterial;
         material.color.set(color);
     }
 }
